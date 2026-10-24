@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 操作系统 / 编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Office 临时锁文件
+~$*
+
+# 本地重跑日志 / 打包产物（不入库）
+_*out.txt
+_pack_log.txt
+*.zip
