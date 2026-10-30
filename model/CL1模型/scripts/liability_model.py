@@ -80,6 +80,13 @@ class ProductAssumptions:
     #     物理测度P名义房价增值率 g_H^P，利率仅通过债务累积(r+c)渠道起作用。
     #   drift_mode="rq"（对照）：dH/H = (r−q)dt + σ_H·dW，为风险中性Q测度估值关系，
     #     仅留作对照，不用于对外真实世界风险约束结论。
+    #
+    # 【冻结字段·勿把主模型改回 (r-q)】本模型输出的 ES95 / 停付概率 / 损失概率
+    #   均为物理测度 P 的指标，用 Q 测度的 (r-q) 漂移去驱动 P 测度模拟属测度混用；
+    #   (r-q) 还会使“加息→房价涨→老人多领”，与机构的利率风险方向相反；
+    #   且已实测房价冲击与利率冲击 ρ≈0 并独立抽取，漂移却耦合于 r，自相矛盾。
+    #   完整理由与全部作废口径见 docs/决策记录.md。
+    #
     # g_H_P 名义基准=0%（暂定审慎定价基准，政策情景假设非统计预测）；压力档 −1%、
     #   上行敏感性 +2%/+4% 由 run 脚本以覆写方式产出。
     drift_mode: str = "gHP"
@@ -532,9 +539,32 @@ def solve_monthly_pmt(
     return low, last_summary
 
 
+# 分区键名白名单：前三个是报告主表口径（2026.03 截面估值），后十六个是网页口径
+# （2020 年度均价 × 70㎡）。两者 H0 不同，同一画像会出两个数字，勿混用。
+SEGMENT_CHOICES = (
+    # 报告主表三键
+    "huangpu_small", "minhang_mid", "jinshan_small",
+    # 网页十六键
+    "huangpu", "xuhui", "changning", "jingan", "putuo", "hongkou",
+    "yangpu", "pudong", "minhang", "baoshan", "jiading", "jinshan",
+    "songjiang", "qingpu", "fengxian", "chongming",
+)
+
+
 def default_segment_assumptions(segment: str) -> ProductAssumptions:
-    """Convenience presets matching the documented Shanghai asset-side matrix."""
+    """Convenience presets matching the documented Shanghai asset-side matrix.
+
+    两套键名并存，H0 口径不同、用途不同，勿互相替代：
+      · 报告主表三键（huangpu_small / minhang_mid / jinshan_small）：H0 取
+        2026.03 截面估值（黄浦 10.1 万、闵行 4.9 万、金山 1.4 万 元/㎡），
+        闵行按改善型取 110㎡。仓库 outputs/ 全部结果表与白皮书数字均由
+        这套键产出，改动会直接改变对外数字。
+      · 网页十六键（huangpu / xuhui / … / chongming）：H0 取马克网 2020 年度
+        均价 × 统一 70㎡，供网页十六区交互使用。与主表同名区数字不一致
+        属设计差异（详见 网页/README.md），不得拿来替换主表结论。
+    """
     presets = {
+        # ---- 报告主表三键：2026.03 截面估值 ----
         # σ_H 采用 gotohui 上海区级年度均价(2011-2020)实测波动率四舍五入：
         # 黄浦10.97%→11%、闵行12.86%→13%、金山13.85%→14%，并被安居客城市全周期
         # 年度σ=13.24%独立印证。属本文设计值(方案A分层标注)，非官方发布口径。
@@ -550,6 +580,32 @@ def default_segment_assumptions(segment: str) -> ProductAssumptions:
         "huangpu_small": dict(property_value=10.1e4 * 70, annual_house_vol=0.11, annual_rent_yield=0.0186, liquidity_discount=0.08, g_H_P=0.0),
         "minhang_mid": dict(property_value=4.9e4 * 110, annual_house_vol=0.13, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),
         "jinshan_small": dict(property_value=1.4e4 * 70, annual_house_vol=0.14, annual_rent_yield=0.0239, liquidity_discount=0.15, g_H_P=0.0),
+
+        # ---- 网页十六键：2020 年度均价 × 70㎡（本版新增，原有三键保留不动）----
+        # σ_H 与上同源；按档设审慎上限（核心区 11%、城区 13%、远郊 14%），
+        # 实测低于上限的保留实测值、高于上限的按上限计，原始实测值写在行尾注释。
+        # 设上限的作用是压住短样本噪声：σ 由 2011-2020 九个年度对数收益率估计，
+        # 单一年份的挂牌结构跳变会被放大成“品质波动”。典型是静安——2019 年
+        # 91,341 元/㎡ 跌到 2020 年 71,219 元/㎡（单年 -22%），实测 σ=19.53%，
+        # 反而高于远郊金山(13.85%)；直接入模会得出“静安月领低于闵行”的
+        # 反常识结果（房价高 43%、每月少拿 34%）。
+        # q 与 ψ 沿用核心区/城区/远郊三档代理值，不是区级官方统计。
+        "huangpu": dict(property_value=90365 * 70, annual_house_vol=0.109701, annual_rent_yield=0.0186, liquidity_discount=0.08, g_H_P=0.0),    # 实测 10.97%，未超上限
+        "xuhui": dict(property_value=71703 * 70, annual_house_vol=0.11, annual_rent_yield=0.0186, liquidity_discount=0.08, g_H_P=0.0),        # 实测 13.44%，超核心区上限
+        "changning": dict(property_value=69130 * 70, annual_house_vol=0.11, annual_rent_yield=0.0186, liquidity_discount=0.08, g_H_P=0.0),    # 实测 12.07%，超核心区上限
+        "jingan": dict(property_value=71219 * 70, annual_house_vol=0.11, annual_rent_yield=0.0186, liquidity_discount=0.08, g_H_P=0.0),       # 实测 19.53%，超核心区上限
+        "putuo": dict(property_value=60232 * 70, annual_house_vol=0.13, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),        # 实测 13.71%，超城区上限
+        "hongkou": dict(property_value=61230 * 70, annual_house_vol=0.129129, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),   # 实测 12.91%，未超上限
+        "yangpu": dict(property_value=59791 * 70, annual_house_vol=0.13, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),       # 实测 15.78%，超城区上限
+        "pudong": dict(property_value=57214 * 70, annual_house_vol=0.13, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),       # 实测 13.69%，超城区上限
+        "minhang": dict(property_value=49618 * 70, annual_house_vol=0.128592, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),   # 实测 12.86%，未超上限
+        "baoshan": dict(property_value=41745 * 70, annual_house_vol=0.13, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),       # 实测 14.54%，超城区上限
+        "jiading": dict(property_value=34820 * 70, annual_house_vol=0.13, annual_rent_yield=0.0188, liquidity_discount=0.10, g_H_P=0.0),       # 实测 14.64%，超城区上限
+        "jinshan": dict(property_value=18105 * 70, annual_house_vol=0.138533, annual_rent_yield=0.0239, liquidity_discount=0.15, g_H_P=0.0),   # 实测 13.85%，未超上限
+        "songjiang": dict(property_value=34585 * 70, annual_house_vol=0.133753, annual_rent_yield=0.0239, liquidity_discount=0.15, g_H_P=0.0), # 实测 13.38%，未超上限
+        "qingpu": dict(property_value=35868 * 70, annual_house_vol=0.14, annual_rent_yield=0.0239, liquidity_discount=0.15, g_H_P=0.0),        # 实测 14.27%，超远郊上限
+        "fengxian": dict(property_value=23784 * 70, annual_house_vol=0.118625, annual_rent_yield=0.0239, liquidity_discount=0.15, g_H_P=0.0),  # 实测 11.86%，未超上限
+        "chongming": dict(property_value=21062 * 70, annual_house_vol=0.14, annual_rent_yield=0.0239, liquidity_discount=0.15, g_H_P=0.0),     # 实测 14.85%，超远郊上限
     }
     if segment not in presets:
         raise ValueError(f"Unknown segment {segment!r}. Choose from {sorted(presets)}.")
@@ -568,7 +624,7 @@ def write_summary_csv(path: Path, summaries: Iterable[SimulationSummary]) -> Non
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run liability-side reverse mortgage simulations.")
     parser.add_argument("--life-table", default=LIFE_TABLE_FILE)
-    parser.add_argument("--segment", default="minhang_mid", choices=["huangpu_small", "minhang_mid", "jinshan_small"])
+    parser.add_argument("--segment", default="minhang_mid", choices=list(SEGMENT_CHOICES))
     parser.add_argument("--sex", default=None, choices=["Male", "Female"])
     parser.add_argument("--start-age", type=int, default=None)
     parser.add_argument("--property-value", type=float, default=None)

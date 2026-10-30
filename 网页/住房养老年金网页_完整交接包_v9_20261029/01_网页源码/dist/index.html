@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="住房养老年金方案测算与风险对比">
+  <title>住房养老年金模型平台</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">安</span><div><strong>住房养老年金方案</strong><span>领取金额与风险测算</span></div></div>
+    <div class="research-flag">研究演示，非正式报价</div>
+  </header>
+
+  <main class="app-shell">
+    <section class="intro-band" aria-labelledby="page-title">
+      <div class="intro-copy">
+        <p class="eyebrow">住房养老年金测算</p>
+        <h1 id="page-title">看清每月能领多少，也看清这份承诺怎么承担风险</h1>
+        <p>填写老人和房屋信息，查看每月参考领取金额，并比较保证给付与动态调额两种方案的差别。</p>
+      </div>
+      <img src="./assets/elder-support.png" alt="工作人员协助老年居民了解养老方案">
+    </section>
+
+    <nav class="view-tabs" aria-label="平台页面">
+      <button id="planTab" class="active" type="button" role="tab" aria-selected="true" aria-controls="planView">领取方案</button>
+      <button id="labTab" type="button" role="tab" aria-selected="false" aria-controls="labView">条件对比</button>
+      <button id="accountTab" type="button" role="tab" aria-selected="false" aria-controls="accountView">签约后看板</button>
+    </nav>
+
+    <section id="planView" role="tabpanel" aria-labelledby="planTab">
+      <div class="workspace">
+        <aside class="input-panel" aria-labelledby="inputTitle">
+          <div class="panel-heading"><div><span class="step-number">01</span><h2 id="inputTitle">填写基本信息</h2></div></div>
+          <fieldset>
+            <legend>老人信息</legend>
+            <div class="field-row two">
+              <label>年龄<select id="age" aria-label="年龄"></select></label>
+              <label>性别<span class="segmented" role="group" aria-label="性别"><button type="button" data-field="sex" data-value="Male" class="active">男</button><button type="button" data-field="sex" data-value="Female">女</button></span></label>
+            </div>
+            <label class="toggle-row"><span><strong>假设老人更加长寿</strong><small>查看领取时间延长后，金额和风险会怎样变化</small></span><input id="longevity" type="checkbox" role="switch"></label>
+          </fieldset>
+          <fieldset>
+            <legend>房屋所在区</legend>
+            <label>选择上海行政区<select id="segment"><option value="huangpu">黄浦区</option><option value="xuhui">徐汇区</option><option value="changning">长宁区</option><option value="jingan">静安区</option><option value="putuo">普陀区</option><option value="hongkou">虹口区</option><option value="yangpu">杨浦区</option><option value="pudong">浦东新区</option><option value="minhang" selected>闵行区</option><option value="baoshan">宝山区</option><option value="jiading">嘉定区</option><option value="jinshan">金山区</option><option value="songjiang">松江区</option><option value="qingpu">青浦区</option><option value="fengxian">奉贤区</option><option value="chongming">崇明区</option></select></label>
+            <p class="field-note">每个区采用该区 2020 年均价和 70㎡统一参考面积，便于横向比较；不是对个人房屋的正式估价。</p>
+            <div class="district-facts"><span><small>区级均价</small><strong id="districtAverage">—</strong></span><span><small>过去房价波动</small><strong id="districtVol">—</strong></span><span><small>区域类别</small><strong id="districtTier">—</strong></span></div>
+            <p class="field-note" id="districtDataNote">区县房价资料加载中。</p>
+          </fieldset>
+          <fieldset>
+            <legend>领取方式</legend>
+            <label>选择房价下跌时怎么发放<span class="segmented contract-switch" role="group" aria-label="领取方式"><button type="button" data-field="contract" data-value="guaranteed" class="active">保证给付</button><button type="button" data-field="contract" data-value="adjustable">动态调额</button></span></label>
+            <div class="choice-explanation" id="contractNote"><strong>保证给付：</strong>老人居住期间按月足额领取，房价下跌也不停发；不足部分由机构或风险资金承担。</div>
+          </fieldset>
+          <div class="fixed-assumptions"><strong>统一测算条件</strong><span>初始授信 50%</span><span>房价按平稳情景</span><span>初始利率 1.22%</span><span>长期参考利率 2.22%</span></div>
+        </aside>
+
+        <section class="result-area" aria-live="polite">
+          <div id="coverageBanner" class="coverage-banner covered" hidden><span class="status-dot" aria-hidden="true"></span><div><strong id="coverageTitle">暂时无法生成方案</strong><p id="coverageText">请检查填写的信息后重试。</p></div></div>
+          <article id="resultPanel" class="result-panel" hidden>
+            <div class="result-heading"><div><span class="step-number">02</span><p class="result-kicker" id="scenarioLabel">闵行改善型 · 男性 · 70 岁</p><h2 id="resultTitle">保证给付方案</h2></div><span class="contract-label" id="contractLabel">在世期间足额发放</span></div>
+            <div class="payout"><div><span>每月可领参考金额</span><strong><small>¥</small><span id="monthlyPmt">—</span></strong><p>在统一安全标准下测算</p></div><div class="payout-context"><span>70㎡参考房产价值</span><strong id="modelPropertyValue">—</strong><small>实际签约前仍需进行房屋评估</small></div></div>
+            <dl class="metrics"><div><dt>预计实际月均</dt><dd id="actualDraw">—</dd></div><div><dt>房款不足风险</dt><dd id="shortfallProbability">—</dd></div><div><dt>极端情况下的平均缺口</dt><dd id="es95">—</dd></div><div><dt id="stopMetricLabel">停付风险</dt><dd id="stoppedProbability">—</dd></div></dl>
+            <p class="metrics-note">“房款不足”指房屋最终处置所得不足以偿还累计债务。数值越低，方案应对房价和寿命变化的余地越大。</p>
+            <section class="contract-meaning"><div><span class="step-number">03</span><h3>这份合同对老人意味着什么</h3></div><p id="contractMeaning">保证给付方案在老人居住期间按约定金额发放。房价明显下跌时产生的损失如何承担，需要在正式合同中写清楚。</p></section>
+          </article>
+          <article id="unsupportedPanel" class="unsupported-panel" hidden><span class="unsupported-icon">!</span><h2>暂时无法生成方案</h2><p>请检查年龄、性别和房屋所在区后重试。</p></article>
+        </section>
+      </div>
+
+      <section class="boundary-strip"><div><strong>按所在区测算</strong><span>各区房价水平和波动情况不同。</span></div><div><strong>统一按 70㎡比较</strong><span>正式签约前仍需评估实际房屋。</span></div><div><strong>房价按平稳情景</strong><span>可在条件对比中查看涨跌影响。</span></div><div><strong>两种领取方式</strong><span>保证给付更稳定；动态调额可能少付。</span></div></section>
+    </section>
+
+    <section id="labView" class="lab-view" role="tabpanel" aria-labelledby="labTab" hidden>
+      <section class="lab-section" aria-labelledby="districtTitle">
+        <div class="lab-heading"><div><p class="eyebrow">区县对比</p><h2 id="districtTitle">上海 16 区住房情况</h2></div><span>统一参考面积 70㎡｜房价资料截至 2020 年</span></div>
+        <p>不同区的房价水平、历史波动和房屋处置难度不同，这些差异会影响每月参考领取金额。</p>
+        <div id="districtResults" class="district-results"></div>
+      </section>
+      <section class="lab-section" aria-labelledby="houseTitle">
+        <div class="lab-heading"><div><p class="eyebrow">房价变化</p><h2 id="houseTitle">房价涨跌会带来什么影响</h2></div><span>参考条件：黄浦区｜男性 65 岁｜保证给付｜初始授信 50%</span></div>
+        <p>基准情况按房价长期平稳测算，也可以查看房价每年下跌 1% 或上涨 2% 时的变化。</p>
+        <div class="segmented expert-switch" role="group" aria-label="房价长期方向敏感性"><button type="button" data-field="driftSpec" data-value="negative_drift_minus1">压力：每年 −1%</button><button type="button" data-field="driftSpec" data-value="baseline_mixture_sigma11" class="active">基准：0%</button><button type="button" data-field="driftSpec" data-value="positive_drift_plus2">上行：每年 +2%</button></div>
+        <div class="sensitivity-result"><div><span>每月参考领取</span><strong id="driftPmt">—</strong></div><div><span>房款不足风险</span><strong id="driftProbability">—</strong></div><div><span>极端情况下的平均缺口</span><strong id="driftEs95">—</strong></div></div>
+      </section>
+      <section class="lab-section" aria-labelledby="rulesTitle">
+        <div class="lab-heading"><div><p class="eyebrow">统一条件</p><h2 id="rulesTitle">各区采用相同的安全标准</h2></div><span>便于比较不同区县的结果</span></div>
+        <div class="comparison-grid three"><div><span>极端情况安全标准</span><strong>缺口不超过 1%</strong><small>相对于参考房产价值</small></div><div><span>初始授信比例</span><strong>50%</strong><small>各区使用相同条件</small></div><div><span>长期房价假设</span><strong>保持平稳</strong><small>不直接照搬历史涨幅</small></div></div>
+      </section>
+    </section>
+
+    <section id="accountView" class="account-view" role="tabpanel" aria-labelledby="accountTab" hidden>
+      <header class="account-header"><div><p class="eyebrow">签约后账户示例</p><h2>房价明显下跌时，两种方案有何不同</h2><p>示例条件：闵行区｜每月领取 8,000 元｜第 10 年房价下跌 30%｜之后每年恢复 1%。</p></div><span class="account-status" id="crisisStatus"><span></span>下跌前</span></header>
+      <div class="account-time-control"><label for="crisisMonth"><span>拖动查看合同运行月份</span><strong id="crisisMonthLabel">第 1 个月</strong></label><input id="crisisMonth" class="range-control" type="range" min="1" max="360" step="1" value="1"><div class="range-scale"><span>签约开始</span><span>第 10 年发生冲击</span><span>第 30 年</span></div></div>
+      <div class="account-summary crisis-summary"><div><span>房屋参考价值</span><strong id="crisisHouse">—</strong><small>随房价情景变化</small></div><div><span>保证给付本月实领</span><strong id="guaranteedDraw">—</strong><small>约定 8,000 元</small></div><div><span>动态调额本月实领</span><strong id="adjustableDraw">—</strong><small id="drawCutText">尚未少付</small></div><div><span>保证给付累计债务</span><strong id="guaranteedDebt">—</strong><small>风险由机构端继续承担</small></div><div><span>动态调额累计债务</span><strong id="adjustableDebt">—</strong><small>受授信额度约束</small></div></div>
+      <div class="account-grid">
+        <section class="account-ledger"><div class="account-section-heading"><div><p class="eyebrow">当月情况</p><h3>合同是否按约定发放</h3></div><span id="pathCheck">正常运行</span></div><div class="ledger-row"><div><strong>房屋价值变化</strong><span>第 10 年一次性下跌 30%，之后缓慢恢复</span></div><b id="houseChange">—</b></div><div class="ledger-row"><div><strong>动态方案剩余额度</strong><span>房价下跌时可能随之降低</span></div><b id="creditLimit">—</b></div><div class="ledger-row"><div><strong>是否触发额度下调</strong><span>只影响动态调额方案</span></div><b id="ratchetState">—</b></div><div class="ledger-row"><div><strong>本月是否少付</strong><span>保证给付仍按约定金额发放</span></div><b id="drawCutState">—</b></div></section>
+        <aside class="family-focus"><p class="eyebrow">家里人重点看</p><h3>看板必须分清三件事</h3><div><span>钱</span><p>名义承诺与本月实际到账是否一致。</p></div><div><span>债</span><p>两类合同的累计债务怎样变化。</p></div><div><span>责</span><p>房价下跌时，是机构承担尾部风险，还是老人接受调额。</p></div></aside>
+      </div>
+      <section class="model-source"><strong>正式签约后可以查看</strong><p>房屋复评结果、每月到账记录、服务费用、累计债务、提前退出结算金额和家属赎回金额。</p></section>
+    </section>
+  </main>
+
+  <footer><span>大学生创新创业训练计划研究原型</span><span>测算依据：官方 CL1（2025）生命表｜统一安全标准</span></footer>
+  <script src="./app.js"></script>
+</body>
+</html>

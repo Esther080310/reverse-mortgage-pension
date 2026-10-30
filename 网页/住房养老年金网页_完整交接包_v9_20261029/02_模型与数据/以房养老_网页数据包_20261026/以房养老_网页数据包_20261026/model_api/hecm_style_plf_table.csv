@@ -1,0 +1,22 @@
+expected_rate,age,plf,source_note
+0.03,62,0.524,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.03,65,0.546,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.03,70,0.576,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.03,75,0.608,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.03,80,0.641,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.03,85,0.674,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.03,90,0.707,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.05,62,0.410,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.05,65,0.434,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.05,70,0.470,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.05,75,0.508,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.05,80,0.548,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.05,85,0.589,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.05,90,0.630,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.06,62,0.344,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.06,65,0.365,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.06,70,0.415,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.06,75,0.460,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.06,80,0.506,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.06,85,0.553,HECM-style curve based on HUD PLF logic; replaceable reference table
+0.06,90,0.604,HECM-style curve based on HUD PLF logic; replaceable reference table
