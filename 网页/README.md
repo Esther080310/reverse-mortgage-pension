@@ -68,7 +68,7 @@
 
 - `dist/data/` 下共 12 个 CSV，页面实际加载其中 4 个（`district_model_lookup`、`district_parameters`、`statistical_specification_sensitivity`、`liability_house_crisis_ratchet_path`），其余为后续功能预留，原样保留。
 - `02_模型与数据/` 内 18 个结果表（含 `validation_fixtures.csv`、`monthly_central_trajectories.csv`）与 `model/CL1模型/outputs/` 同名同大小，属同一套结果的副本，以 `outputs/` 为准。
-- `04_部署包/home-pension-site-v9.tar.gz` 与 `01_网页源码/dist` 内容一致。注意其中打包的是**重算前**的旧结果，若要重新部署，请以当前 `dist/` 目录重新打包。
+- `04_部署包/home-pension-site-v9.tar.gz` 已于 2026-10-30 按封顶后口径重新打包：`dist` 全量 18 个文件 + `.openai/hosting.json`，共 19 个文件已与当前 `dist/` 逐字节核对一致。日后 `dist/` 再变请重新打包，否则部署包会回退到旧数字。
 - 网页端问题请找网页负责队员；模型参数与口径问题以 `model/CL1模型/` 与 `docs/白皮书` 为准。
 
 ## 四、本次整理都改了什么
@@ -79,7 +79,9 @@
 | `02_模型与数据/build_district_outputs.py` | 新增 `TIER_VOL_CAP`，参数表增加 `raw_annual_house_vol`、`vol_capped` 两列 |
 | `02_模型与数据/.../tables/district_parameters.csv` | 按封顶口径重算 |
 | `02_模型与数据/.../tables/district_model_lookup.csv` | 按封顶口径重算 1,984 个画像 |
-| `01_网页源码/dist/data/` 同名两表 | 与上面两份同步，网页刷新即可看到新数字 |
+| `02_模型与数据/.../tables/district_model_lookup_age70.csv` | 由新全量表重新切出 64 行（原切片停在封顶前，静安仍为 σ=19.53%、893.82 元） |
+| `01_网页源码/dist/data/` 同名三表 | 与上面三份同步，网页刷新即可看到新数字 |
 | `网页/README.md`（即本文件） | 新增，记四处口径差异、排除项与改动表 |
 | `02_模型与数据/.../02_白皮书_口径权威.md` | 已删除 |
-| `文件清单.csv` | 删去已删的白皮书条目、重算全部 SHA-256；清单自身不列入清单（原设计本就不含自身，否则自指哈希永远对不上），现为 61 条对 61 个文件，可重复校验 |
+| `04_部署包/home-pension-site-v9.tar.gz` | 以新 `dist/` 重新打包，19 个文件逐字节核对一致 |
+| `文件清单.csv` | 删去已删的白皮书条目、重算全部 SHA-256；清单自身不列入清单（原设计本就不含自身，否则自指哈希永远对不上），现为 61 条对 61 个文件。注意其中 3 个文件被 `01_网页源码/.gitignore` 排除（`dist/data/district_model_lookup_age70.csv` 与 2 个 `__pycache__/*.pyc`），本地校验全过、clone 后会计报这 3 处缺失，属预期而非损坏 |
