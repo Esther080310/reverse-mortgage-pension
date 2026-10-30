@@ -19,3 +19,6 @@ desktop.ini
 _*out.txt
 _pack_log.txt
 *.zip
+
+# WPS/编辑器自动保存的贴图与截图目录（不入仓）
+image/
